@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lalah's Horn</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@900&display=swap" rel="stylesheet">
+
+    <style>
+        html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #e0e0e0;
+            height: 100vh;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .hide {
+            opacity: 0;
+            padding-top: 30px;
+        }
+
+
+        .text {
+            font-family: 'Kanit', sans-serif;
+            color: rgb(95, 95, 95);
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            font-size: 35px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all .5s ease 0s;
+            padding-top: 0;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .no-transition {
+            transition: all 0s ease 0s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading"  class="text no-transition">Carregando...</div>
+    <div id="text-0"  class="text hide">Bora?<br />Clique para iniciar</div>
+    <div id="text-1"  class="text hide">Toque e segure<br />na tela</div>
+    <div id="text-2" class="text hide">Agora você pode buzinar para todo mundo, mesmo estando a pé!<br />:D</div>
+
+    <script type="text/javascript">
+        let initialized = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const aCtx = new AudioContext();
+            let source = aCtx.createBufferSource();
+            let buf;
+
+            const updatePage = () => {
+                if (currentPage === 1) {
+                    document.querySelector('#loading').classList.add('hide');
+                    document.querySelector('#text-0').classList.remove('hide');
+                }
+                if (currentPage === 2) {
+                    document.querySelector('#text-0').classList.add('hide');
+                    document.querySelector('#text-1').classList.remove('hide');
+                }
+                if (currentPage === 3) {
+                    document.querySelector('#text-1').classList.add('hide');
+                    document.querySelector('#text-2').classList.remove('hide');
+                }
+            }
+
+            fetch('snd2.mp3')
+                .then(resp => resp.arrayBuffer())
+                .then(buf => aCtx.decodeAudioData(buf))
+                .then(decoded => {
+                    source.buffer = buf = decoded;
+                    source.loop = true;
+                    source.connect(aCtx.destination);
+
+                    currentPage = 1;
+                    updatePage();
+                });
+
+            let body = document.querySelector('body');
+            body.addEventListener('click', () => {
+                switch(currentPage) {
+                    case 0:
+                        break;
+                    case 1:
+                        currentPage = 2; updatePage(); break;
+                    case 2:
+                        currentPage = 3; updatePage(); break;
+                    default:
+                        currentPage = 3;
+                }
+            });
+
+            const playSound = () => {
+                if (currentPage === 2) {
+                    currentPage = 3;
+                    updatePage();
+                }
+
+                source.start(0);
+            };
+
+            const stopSound = () => {
+                source.stop(0);
+                source = aCtx.createBufferSource();
+                source.buffer = buf;
+                source.loop = true;
+                source.connect(aCtx.destination);
+            }
+
+            body.addEventListener('touchstart', playSound);
+            body.addEventListener('touchend', stopSound);
+            body.addEventListener('touchcancel', stopSound);
+            Array.from(document.querySelectorAll('.text')).map(item => {
+                item.addEventListener('select', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
+                });
+            }); 
+        });
+    </script>
+</body>
+</html>
