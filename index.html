@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lalah's Horn</title>
+    <title>Horn</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@900&display=swap" rel="stylesheet">
@@ -64,6 +64,7 @@
 </head>
 <body>
     <div id="loading"  class="text no-transition">Carregando...</div>
+    <div id="error"  class="text no-transition hide">Ops, seu celular não tem os recursos necessários :(</div>
     <div id="text-0"  class="text hide">Bora?<br />Aumente o volume<br /> e clique para iniciar</div>
     <div id="text-1"  class="text hide">Toque e segure<br />na tela</div>
     <div id="text-2" class="text hide">Agora você pode buzinar para todo mundo, mesmo estando a pé!<br />:D</div>
@@ -72,6 +73,14 @@
         let initialized = false;
         document.addEventListener('DOMContentLoaded', () => {
             
+            const AudioContext = window.AudioContext || window.webkitAudioContext || false; 
+
+            if (!AudioContext) {
+                document.querySelector('#loading').classList.add('hide');
+                document.querySelector('#error').classList.remove('hide');
+                return;
+            }
+
             const aCtx = new AudioContext();
             let source = aCtx.createBufferSource();
             let buf;
