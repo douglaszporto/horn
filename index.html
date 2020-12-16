@@ -102,7 +102,14 @@
 
             fetch('snd2.mp3')
                 .then(resp => resp.arrayBuffer())
-                .then(buf => aCtx.decodeAudioData(buf))
+                .then(buf => {
+                    return new Promise((resolve, reject) => {
+                        aCtx.decodeAudioData(buf, (buffer) => { 
+                            resolve(buffer); 
+                        }, (e) => { reject(e); });
+                    });
+
+                )
                 .then(decoded => {
                     source.buffer = buf = decoded;
                     source.loop = true;
