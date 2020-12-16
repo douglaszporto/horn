@@ -108,8 +108,7 @@
                             resolve(buffer); 
                         }, (e) => { reject(e); });
                     });
-
-                )
+                })
                 .then(decoded => {
                     source.buffer = buf = decoded;
                     source.loop = true;
