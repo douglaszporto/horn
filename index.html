@@ -183,9 +183,8 @@
                 console.log('stopSound 2');
             }
 
-            body.addEventListener('touchstart', playSound);
-            body.addEventListener('touchend', stopSound);
-            body.addEventListener('touchcancel', stopSound);
+            body.addEventListener('mousedown', playSound);
+            body.addEventListener('mouseup', stopSound);
             Array.from(document.querySelectorAll('.text')).map(item => {
                 item.addEventListener('select', (e) => {
                     e.stopPropagation();
