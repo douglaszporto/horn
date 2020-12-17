@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
     <title>Horn</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -159,7 +159,8 @@
                 }
             });
 
-            const playSound = () => {
+            const playSound = (e) => {
+                e.preventDefault();
                 console.log('playSound 1');
                 if (currentPage === 2) {
                     currentPage = 3;
@@ -171,7 +172,8 @@
                 console.log('playSound 3');
             };
 
-            const stopSound = () => {
+            const stopSound = (e) => {
+                e.preventDefault();
                 console.log('stopSound 1');
                 source.stop(0);
                 source = aCtx.createBufferSource();
