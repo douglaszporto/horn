@@ -160,7 +160,6 @@
             });
 
             const playSound = (e) => {
-                e.preventDefault();
                 console.log('playSound 1');
                 if (currentPage === 2) {
                     currentPage = 3;
@@ -170,10 +169,10 @@
                 console.log('playSound 2');
                 source.start(0);
                 console.log('playSound 3');
+                e.preventDefault();
             };
 
             const stopSound = (e) => {
-                e.preventDefault();
                 console.log('stopSound 1');
                 source.stop(0);
                 source = aCtx.createBufferSource();
@@ -181,10 +180,12 @@
                 source.loop = true;
                 source.connect(aCtx.destination);
                 console.log('stopSound 2');
+
+                e.preventDefault();
             }
 
-            body.addEventListener('mousedown', playSound);
-            body.addEventListener('mouseup', stopSound);
+            body.addEventListener('mousemove', playSound);
+            body.addEventListener('touchend', stopSound);
             Array.from(document.querySelectorAll('.text')).map(item => {
                 item.addEventListener('select', (e) => {
                     e.stopPropagation();
