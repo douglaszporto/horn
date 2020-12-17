@@ -185,7 +185,7 @@
             }
 
             body.addEventListener('mousemove', playSound);
-            body.addEventListener('touchend', stopSound);
+            body.addEventListener('click', stopSound);
             Array.from(document.querySelectorAll('.text')).map(item => {
                 item.addEventListener('select', (e) => {
                     e.stopPropagation();
