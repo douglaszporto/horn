@@ -88,6 +88,21 @@
         .no-transition {
             transition: all 0s ease 0s;
         }
+
+        #text-2 {
+            background: url('bkg.jpg') no-repeat 50% 50%;
+            background-size: cover;
+            justify-content: flex-end;
+        }
+
+        #text-2 div{
+            background-color: rgba(255,255,255, .7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
     </style>
 </head>
 <body>
@@ -95,8 +110,12 @@
         <div id="loading"  class="text no-transition">Carregando...</div>
         <div id="error"  class="text no-transition hide">Ops, seu celular não tem os recursos necessários :(</div>
         <div id="text-0"  class="text hide">Bora?<br />Aumente o volume<br /> e clique para iniciar</div>
-        <div id="text-1"  class="text hide">Toque e segure<br />na tela</div>
-        <div id="text-2" class="text hide">Agora você pode buzinar para todo mundo, mesmo estando a pé!<br />:D</div>
+        <div id="group-1" class="text hide">
+            <div id="text-1"  class="text hide">Toque para ligar/desligar</div>
+            <div id="text-2" class="text hide">
+                <div>Agora você pode buzinar para todo mundo, mesmo estando a pé!<br />:D</div>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -114,6 +133,7 @@
             const aCtx = new AudioContext();
             let source = aCtx.createBufferSource();
             let buf;
+            let clickState = 0;
 
             const updatePage = () => {
                 if (currentPage === 1) {
@@ -122,6 +142,7 @@
                 }
                 if (currentPage === 2) {
                     document.querySelector('#text-0').classList.add('hide');
+                    document.querySelector('#group-1').classList.remove('hide');
                     document.querySelector('#text-1').classList.remove('hide');
                 }
                 if (currentPage === 3) {
@@ -158,46 +179,32 @@
                     case 2:
                         currentPage = 3; updatePage(); break;
                     default:
-                        currentPage = 3;
+                        updatePage();
                 }
             });
 
             const playSound = (e) => {
-                console.log('playSound 1');
+                console.log('playSound', currentPage);
                 if (currentPage === 2) {
                     currentPage = 3;
-                    updatePage();
+                    clickState++;
+                    return;
                 }
 
-                console.log('playSound 2');
-                source.start(0);
-                console.log('playSound 3');
-                e.preventDefault();
+                if (clickState === 1) {
+                    clickState = 2;
+                    source.start(0);
+                } else {
+                    clickState = 1;
+                    source.stop(0);
+                    source = aCtx.createBufferSource();
+                    source.buffer = buf;
+                    source.loop = true;
+                    source.connect(aCtx.destination);
+                }
             };
 
-            const stopSound = (e) => {
-                console.log('stopSound 1');
-                source.stop(0);
-                source = aCtx.createBufferSource();
-                source.buffer = buf;
-                source.loop = true;
-                source.connect(aCtx.destination);
-                console.log('stopSound 2');
-
-                e.preventDefault();
-            }
-
-            body.addEventListener('touchstart', playSound);
-            body.addEventListener('touchmove', () => {console.log('Touch move')});
-            body.addEventListener('touchend', stopSound);
-            body.addEventListener('touchcancel', stopSound);
-            Array.from(document.querySelectorAll('.text')).map(item => {
-                item.addEventListener('select', (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                });
-            }); 
+            body.addEventListener('click', playSound);
         });
     </script>
 </body>
