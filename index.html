@@ -185,6 +185,7 @@
             }
 
             body.addEventListener('mousemove', playSound);
+            body.addEventListener('mouseup', stopSound);
             body.addEventListener('click', stopSound);
             Array.from(document.querySelectorAll('.text')).map(item => {
                 item.addEventListener('select', (e) => {
