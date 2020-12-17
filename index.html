@@ -160,20 +160,25 @@
             });
 
             const playSound = () => {
+                console.log('playSound 1');
                 if (currentPage === 2) {
                     currentPage = 3;
                     updatePage();
                 }
 
+                console.log('playSound 2');
                 source.start(0);
+                console.log('playSound 3');
             };
 
             const stopSound = () => {
+                console.log('stopSound 1');
                 source.stop(0);
                 source = aCtx.createBufferSource();
                 source.buffer = buf;
                 source.loop = true;
                 source.connect(aCtx.destination);
+                console.log('stopSound 2');
             }
 
             body.addEventListener('touchstart', playSound);
