@@ -28,6 +28,7 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-touch-callout: none !important; 
         }
 
         #page {
@@ -49,6 +50,7 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-touch-callout: none !important; 
         }
 
         .hide {
@@ -80,6 +82,7 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-touch-callout: none !important; 
         }
 
         .no-transition {
@@ -184,9 +187,10 @@
                 e.preventDefault();
             }
 
-            body.addEventListener('mousemove', playSound);
-            body.addEventListener('mouseup', stopSound);
-            body.addEventListener('click', stopSound);
+            body.addEventListener('touchstart', playSound);
+            body.addEventListener('touchmove', () => {console.log('Touch move')});
+            body.addEventListener('touchend', stopSound);
+            body.addEventListener('touchcancel', stopSound);
             Array.from(document.querySelectorAll('.text')).map(item => {
                 item.addEventListener('select', (e) => {
                     e.stopPropagation();
