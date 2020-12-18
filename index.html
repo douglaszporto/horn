@@ -93,6 +93,7 @@
             background: url('bkg.jpg') no-repeat 50% 50%;
             background-size: cover;
             justify-content: flex-end;
+            margin-bottom: 80px;
         }
 
         #text-2 div{
@@ -106,7 +107,8 @@
     </style>
 </head>
 <body>
-    <div id="page">
+    <audio id="som"></audio>
+    <div id="page" href="#">
         <div id="loading"  class="text no-transition">Carregando...</div>
         <div id="error"  class="text no-transition hide">Ops, seu celular não tem os recursos necessários :(</div>
         <div id="text-0"  class="text hide">Bora?<br />Aumente o volume<br /> e clique para iniciar</div>
@@ -119,92 +121,70 @@
     </div>
 
     <script type="text/javascript">
-        let initialized = false;
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            const AudioContext = window.AudioContext || window.webkitAudioContext || false; 
+        let firstRun = true;
+        let clickState = 0;
+        let audio = document.querySelector('#som');
+        let body = document.querySelector('#page');
 
-            if (!AudioContext) {
+        audio.addEventListener('error', (e) => {
+            alert(e);
+        }, false);
+
+        audio.src="snd.wav";
+        audio.load();
+
+        const updatePage = () => {
+            if (currentPage === 1) {
                 document.querySelector('#loading').classList.add('hide');
-                document.querySelector('#error').classList.remove('hide');
+                document.querySelector('#text-0').classList.remove('hide');
+            }
+            if (currentPage === 2) {
+                document.querySelector('#text-0').classList.add('hide');
+                document.querySelector('#group-1').classList.remove('hide');
+                document.querySelector('#text-1').classList.remove('hide');
+            }
+            if (currentPage === 3) {
+                document.querySelector('#text-1').classList.add('hide');
+                document.querySelector('#text-2').classList.remove('hide');
+            }
+        }
+
+        audio.addEventListener('canplaythrough', () => {
+            if (!firstRun) {return}
+
+            currentPage = 1;
+            updatePage();
+            firstRun = false;
+        }, false);
+
+        body.addEventListener('click', () => {
+            switch(currentPage) {
+                case 0:
+                    break;
+                case 1:
+                    currentPage = 2; updatePage(); break;
+                case 2:
+                    currentPage = 3; updatePage(); break;
+                default:
+                    updatePage();
+            }
+
+            if (currentPage === 2) {
+                currentPage = 3;
+                clickState++;
                 return;
             }
 
-            const aCtx = new AudioContext();
-            let source = aCtx.createBufferSource();
-            let buf;
-            let clickState = 0;
-
-            const updatePage = () => {
-                if (currentPage === 1) {
-                    document.querySelector('#loading').classList.add('hide');
-                    document.querySelector('#text-0').classList.remove('hide');
-                }
-                if (currentPage === 2) {
-                    document.querySelector('#text-0').classList.add('hide');
-                    document.querySelector('#group-1').classList.remove('hide');
-                    document.querySelector('#text-1').classList.remove('hide');
-                }
-                if (currentPage === 3) {
-                    document.querySelector('#text-1').classList.add('hide');
-                    document.querySelector('#text-2').classList.remove('hide');
-                }
+            if (clickState === 1) {
+                audio.currentTime = 0;
+                audio.play();
+                clickState = 2;
+            } else {
+                audio.pause();
+                clickState = 1;
             }
-
-            fetch('snd2.mp3')
-                .then(resp => resp.arrayBuffer())
-                .then(buf => {
-                    return new Promise((resolve, reject) => {
-                        aCtx.decodeAudioData(buf, (buffer) => { 
-                            resolve(buffer); 
-                        }, (e) => { reject(e); });
-                    });
-                })
-                .then(decoded => {
-                    source.buffer = buf = decoded;
-                    source.loop = true;
-                    source.connect(aCtx.destination);
-
-                    currentPage = 1;
-                    updatePage();
-                });
-
-            let body = document.querySelector('#page');
-            body.addEventListener('click', () => {
-                switch(currentPage) {
-                    case 0:
-                        break;
-                    case 1:
-                        currentPage = 2; updatePage(); break;
-                    case 2:
-                        currentPage = 3; updatePage(); break;
-                    default:
-                        updatePage();
-                }
-            });
-
-            const playSound = (e) => {
-                if (currentPage === 2) {
-                    currentPage = 3;
-                    clickState++;
-                    return;
-                }
-
-                if (clickState === 1) {
-                    clickState = 2;
-                    source.start(0);
-                } else {
-                    clickState = 1;
-                    source.stop(0);
-                    source = aCtx.createBufferSource();
-                    source.buffer = buf;
-                    source.loop = true;
-                    source.connect(aCtx.destination);
-                }
-            };
-
-            body.addEventListener('click', playSound);
         });
+
     </script>
 </body>
 </html>
